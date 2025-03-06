@@ -1,7 +1,12 @@
 import { parseCourseTime } from "./helperFunctions";
-import { Course, ScheduledTime, CourseTimes, FilteredCourseList, UnitDomain, ActivityDomain } from "./interfaces";
-
-
+import {
+  Course,
+  ScheduledTime,
+  CourseTimes,
+  FilteredCourseList,
+  UnitDomain,
+  ActivityDomain,
+} from "./interfaces";
 
 /// -----------------------------------------------------------------------------------------------------
 ///
@@ -45,9 +50,7 @@ export default function scheduleUnits(
   };
 
   // Sort activities to prioritize those with fewer options (MRV within the unit)
-  unitToSchedule.activities.sort(
-    (a, b) => a.courses.length - b.courses.length
-  );
+  unitToSchedule.activities.sort((a, b) => a.courses.length - b.courses.length);
 
   // Schedule activities for the unit
   if (
@@ -66,8 +69,6 @@ export default function scheduleUnits(
   }
 }
 
-
-
 function selectNextUnit(units: UnitDomain[]): UnitDomain {
   //// Function to select the next unit to schedule using MRV heuristic
   ///
@@ -78,13 +79,10 @@ function selectNextUnit(units: UnitDomain[]): UnitDomain {
   ///
 
   units.sort(
-    (a, b) =>
-      totalDomainSize(a.activities) - totalDomainSize(b.activities)
+    (a, b) => totalDomainSize(a.activities) - totalDomainSize(b.activities)
   );
   return units[0];
 }
-
-
 
 function totalDomainSize(activities: ActivityDomain[]): number {
   //// Function to calculate the total number of course options across all activities
@@ -97,8 +95,6 @@ function totalDomainSize(activities: ActivityDomain[]): number {
 
   return activities.reduce((acc, activity) => acc + activity.courses.length, 0);
 }
-
-
 
 function scheduleActivities(
   unit: UnitDomain,
@@ -185,8 +181,6 @@ function scheduleActivities(
   return false;
 }
 
-
-
 function orderCoursesByLCV(
   courses: Course[],
   unitDomains: UnitDomain[]
@@ -207,8 +201,6 @@ function orderCoursesByLCV(
     return impactA - impactB;
   });
 }
-
-
 
 function calculateImpact(course: Course, unitDomains: UnitDomain[]): number {
   //// Function to calculate the impact of selecting a course on future options
@@ -242,8 +234,6 @@ function calculateImpact(course: Course, unitDomains: UnitDomain[]): number {
 
   return impact;
 }
-
-
 
 function applyForwardChecking(
   unitDomains: UnitDomain[],
@@ -281,8 +271,6 @@ function applyForwardChecking(
   return prunedDomains;
 }
 
-
-
 function domainsAreEmpty(unitDomains: UnitDomain[]): boolean {
   //// Function to check if any unit has no valid courses remaining
   ///
@@ -303,11 +291,10 @@ function domainsAreEmpty(unitDomains: UnitDomain[]): boolean {
   return false;
 }
 
-
-
-function parseCourseTimes(
-  timeRange: string
-): { startTime: Date; endTime: Date } {
+function parseCourseTimes(timeRange: string): {
+  startTime: Date;
+  endTime: Date;
+} {
   //// Function to parse course time strings into start and end Date objects
   ///
   /// inputs:
@@ -321,8 +308,6 @@ function parseCourseTimes(
   const endTime = parseCourseTime(endTimeStr);
   return { startTime, endTime };
 }
-
-
 
 function hasTimeConflict(
   scheduledTimes: ScheduledTime[],

@@ -3,15 +3,15 @@
 import axios from "axios";
 import * as cheerio from "cheerio"; // Use named import
 import { v4 as uuidv4 } from "uuid"; // Import UUID for unique IDs
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 // Add courses to global storage in nested dictionary format
-export async function GET(request: { url: string | URL; }) {
+export async function GET(request: { url: string | URL }) {
   try {
     // Get the search parameters from the request URL
     const url = new URL(request.url);
-    const unitCode = url.searchParams.get('unitCode');
-    const teachingPeriod = url.searchParams.get('teachingPeriod');
+    const unitCode = url.searchParams.get("unitCode");
+    const teachingPeriod = url.searchParams.get("teachingPeriod");
 
     const qut_data = `https://qutvirtual3.qut.edu.au/qvpublic/ttab_unit_search_p.process_search?p_unit=${unitCode}&p_unit_description=&p_time_period_id=${teachingPeriod}&p_arg_names=Class+timetable+search&p_arg_values=%2Fttab_unit_search_p.show_search_adv%3F`;
     const { data } = await axios.get(qut_data);

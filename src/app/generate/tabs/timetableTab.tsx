@@ -11,7 +11,6 @@ const TimetableView: React.FC<TimetableViewProps> = ({
   preferences,
   setTab,
 }) => {
-
   // Filter the course list based on user preferences to generate a conflict-free timetable
   const timetableData = filterCourseList(courseList, preferences.studyTimes);
 
@@ -37,15 +36,13 @@ const TimetableView: React.FC<TimetableViewProps> = ({
       {/* Display message if no timetable could be generated */}
       {!timetableData && (
         <div className="text-red-500 text-center mb-4">
-          Unable to create a conflict-free timetable with the selected preferences.
+          Unable to create a conflict-free timetable with the selected
+          preferences.
         </div>
       )}
 
       {/* Display the timetable (even if empty) */}
-      <Timetable
-        courses={timetableData || {}}
-        unitColors={unitColors}
-      />
+      <Timetable courses={timetableData || {}} unitColors={unitColors} />
     </>
   );
 };
@@ -134,7 +131,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
     { length: (21 - 8) * 2 + 1 }, // This resulted in 27 slots
     (_, i) => 8 + i * 0.5
   );
-  
+
   return (
     <div className="w-full overflow-x-auto">
       {/* Header row with day names */}
@@ -173,10 +170,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
           <div key={day} className="relative border-l border-gray-700">
             {/* Rows for each time slot */}
             {timeSlots.map((time, idx) => (
-              <div
-                key={time}
-                className="relative h-8 border-b border-gray-600"
-              >
+              <div key={time} className="relative h-8 border-b border-gray-600">
                 {/* Place courses that start at this time */}
                 {timetable[day][time]?.map((course, index, arr) => {
                   const { start, end } = parseTime(course.time);
@@ -224,13 +218,11 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
                 <div key={idx} className="border-b border-gray-600 h-8"></div>
               ))}
             </div>
-
           </div>
         ))}
       </div>
     </div>
   );
 };
-
 
 export default TimetableView;

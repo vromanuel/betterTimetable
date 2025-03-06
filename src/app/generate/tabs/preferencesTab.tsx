@@ -29,8 +29,12 @@ const Preferences: React.FC<TimetableViewProps> = ({
 
   // State variables for drag selection
   const [isDragging, setIsDragging] = useState(false);
-  const [dragAction, setDragAction] = useState<"select" | "deselect" | null>(null);
-  const [draggedTimeslots, setDraggedTimeslots] = useState<{ [day: string]: Set<string> }>({});
+  const [dragAction, setDragAction] = useState<"select" | "deselect" | null>(
+    null
+  );
+  const [draggedTimeslots, setDraggedTimeslots] = useState<{
+    [day: string]: Set<string>;
+  }>({});
 
   // Event handlers
   const handleMouseDown = (
@@ -41,7 +45,8 @@ const Preferences: React.FC<TimetableViewProps> = ({
     e.preventDefault();
     setIsDragging(true);
 
-    const isSelected = preferences.studyTimes[day]?.includes(timeValue) ?? false;
+    const isSelected =
+      preferences.studyTimes[day]?.includes(timeValue) ?? false;
     const action = isSelected ? "deselect" : "select";
     setDragAction(action);
 
@@ -78,7 +83,8 @@ const Preferences: React.FC<TimetableViewProps> = ({
     e.preventDefault();
     setIsDragging(true);
 
-    const isSelected = preferences.studyTimes[day]?.includes(timeValue) ?? false;
+    const isSelected =
+      preferences.studyTimes[day]?.includes(timeValue) ?? false;
     const action = isSelected ? "deselect" : "select";
     setDragAction(action);
 

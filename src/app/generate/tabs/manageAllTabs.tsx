@@ -6,14 +6,17 @@ import { useState } from "react";
 import Units from "./unitsTab";
 import Preferences from "./preferencesTab";
 import TimetableView from "./timetableTab";
-import { UnitData, PreferencesData } from '../algorithms/interfaces';
+import { UnitData, PreferencesData } from "../algorithms/interfaces";
 
 // Main component that manages the application tabs and state
 export default function ManageTabs() {
-
   const [courseList, setCourseList] = useState<{ [key: string]: UnitData }>({});
-  const [preferences, setPreferences] = useState<PreferencesData>({ studyTimes: {} });
-  const [tab, setTab] = useState<"units" | "preferences" | "timetable">("units");
+  const [preferences, setPreferences] = useState<PreferencesData>({
+    studyTimes: {},
+  });
+  const [tab, setTab] = useState<"units" | "preferences" | "timetable">(
+    "units"
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Define a color palette to assign colors to units dynamically
@@ -63,11 +66,11 @@ export default function ManageTabs() {
       {/* Render the Preferences component when on the "preferences" tab */}
       {tab === "preferences" && (
         <Preferences
-          courseList={courseList}      // Passed as part of TimetableViewProps
-          preferences={preferences}     // Pass the entire preferences object
+          courseList={courseList} // Passed as part of TimetableViewProps
+          preferences={preferences} // Pass the entire preferences object
           setPreferences={setPreferences} // Pass the setter function
           setTab={setTab}
-          unitColors={unitColors}       // Passed as part of TimetableViewProps
+          unitColors={unitColors} // Passed as part of TimetableViewProps
         />
       )}
 
@@ -76,6 +79,7 @@ export default function ManageTabs() {
         <TimetableView
           courseList={courseList}
           preferences={preferences}
+          setPreferences={setPreferences}
           setTab={setTab}
           unitColors={unitColors}
         />

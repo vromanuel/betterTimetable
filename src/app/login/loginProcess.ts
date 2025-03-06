@@ -38,21 +38,24 @@ export default async function login(username: string, password: string) {
     expiresAt.setHours(expiresAt.getHours() + 24); // Session valid for 24 hours
 
     // Store session in the database
-    await db.insert(sessions).values({
-      id: sessionToken,
-      userId: user.id,
-      expiresAt: sql`${expiresAt}`,
-    }).execute();
+    await db
+      .insert(sessions)
+      .values({
+        id: sessionToken,
+        userId: user.id,
+        expiresAt: sql`${expiresAt}`,
+      })
+      .execute();
 
     console.log("Session created and token stored in database");
 
     // Set the session token in cookies
-    const cookieStore = cookies();  // Get the cookie store
+    const cookieStore = cookies(); // Get the cookie store
     cookieStore.set("sessionToken", sessionToken, {
-      httpOnly: true,  // For security, the cookie is not accessible via JavaScript
+      httpOnly: true, // For security, the cookie is not accessible via JavaScript
       maxAge: 24 * 60 * 60, // Expiration time of 24 hours in seconds
-      path: "/",  // The cookie will be available for the entire domain
-      secure: process.env.NODE_ENV === "production",  // Set `secure` flag in production (ensure cookies are only sent over HTTPS)
+      path: "/", // The cookie will be available for the entire domain
+      secure: process.env.NODE_ENV === "production", // Set `secure` flag in production (ensure cookies are only sent over HTTPS)
     });
 
     console.log("Session token stored in cookies");
@@ -61,6 +64,9 @@ export default async function login(username: string, password: string) {
     return { success: true, sessionToken };
   } catch (error) {
     console.error("Login error:", error);
-    return { success: false, message: "Something went wrong. Please try again." };
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
   }
 }
