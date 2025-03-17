@@ -1,10 +1,13 @@
-import Details from "./details"
+import React from 'react';
+import Details from './details'; // Adjust import path accordingly
+import { validateSession } from "../../auth/sessionManager";
 
-export default function page() {
-    return(
-        <div className="min-h-screen w-full items-center px-12 bg-gray-1000 text-white">
-            <h1> Hello World! </h1>
-            <Details />
-        </div>
-    )
+export default async function ServerComponent() {
+  const { user } = await validateSession();
+
+  return (
+    <>
+      <Details />
+    </>
+  );
 }

@@ -13,7 +13,7 @@
   could be potentially slowing down the web app, 
   but it slightly improves UX so keeping for now*/
 .active-link {
-  background: #007FFF !important;
+  background: #007ee6 !important;
   color: white !important;
   border-radius: 9999px !important; 
   transition: all 0.3s ease-in-out;
@@ -23,7 +23,13 @@
 /* Background class */
 .loginBackground {
   @apply relative bg-cover bg-center;
-  background-image: url('./images/beach.jpg');
+  background-image: url('./images/data.jpg');
+}
+
+/* Background class */
+.qutLogo {
+  @apply relative bg-cover bg-center;
+  background-image: url('./images/qut_logo.png');
 }
 
 /* Custom row padding for table rows */

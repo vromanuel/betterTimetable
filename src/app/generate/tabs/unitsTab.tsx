@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { preconnect } from "react-dom";
+import checkUnit from "../download_data/checkUnits";
+import uploadUnit from "../download_data/uploadUnit";
+import downloadUnit from "../download_data/downloadUnits";
+import { courses } from "@/db/schema";
 
 // Define the structure for an individual course
 interface Course {
@@ -97,7 +102,8 @@ const Units: React.FC<UnitsProps> = ({
         const response = await fetch(
           `/api/course-data?unitCode=${formattedUnitCode}&teachingPeriod=${period.value}`
         );
-
+        console.log("API Call -", response.url);
+        console.log(response);
         const data = await response.json();
 
         if (Object.keys(data).length === 0) {
@@ -128,23 +134,60 @@ const Units: React.FC<UnitsProps> = ({
     if (selectedPeriod) {
       const formattedUnitCode = unitCode.toUpperCase(); // Ensure unit code is uppercase
 
+      // Fetch course data for the selected unit and period from the API
       try {
-        const response = await fetch(
-          `/api/course-data?unitCode=${formattedUnitCode}&teachingPeriod=${selectedPeriod}`
-        );
+        // Check if the unit exists in the database
+        const dbResponse = await checkUnit(formattedUnitCode);
+        if (dbResponse.exists) {
+          // Fetch course data from database
+          const courseResponse = await downloadUnit(formattedUnitCode);
 
-        const data = await response.json();
-        const unitData = data[formattedUnitCode]; // Extract unit data
+          if (courseResponse.success) {
+            const unitData = {
+              unitName: courseResponse.unitName,
+              courses: courseResponse.courseData,
+            };
 
-        // Update the course list with the new unit data
-        setCourseList((prevCourses) => ({
-          ...prevCourses,
-          [formattedUnitCode]: unitData,
-        }));
+            if (unitData.unitName && unitData.courses) {
+              setCourseList((prevCourses) => ({
+                ...prevCourses,
+                [formattedUnitCode]: unitData as CourseData,
+              }));
+            } else {
+              setError("Invalid unit data received.");
+            }
+          }
 
-        setShowDialog(false); // Close the dialog
-        setUnitCode(""); // Reset unit code input
-        setSelectedPeriod(""); // Reset selected period
+          setShowDialog(false); // Close the dialog
+          setUnitCode(""); // Reset unit code input
+          setSelectedPeriod(""); // Reset selected period
+        } else {
+          const response = await fetch(
+            `/api/course-data?unitCode=${formattedUnitCode}&teachingPeriod=${selectedPeriod}`
+          );
+
+          const data = await response.json();
+          const unitData = data[formattedUnitCode]; // Extract unit data
+
+          // Update the course list with the new unit data
+          setCourseList((prevCourses) => ({
+            ...prevCourses,
+            [formattedUnitCode]: unitData,
+          }));
+
+          // Add the new unit data to the SQL database in the background
+          uploadUnit(
+            formattedUnitCode,
+            unitData.courses,
+            unitData.unitName
+          ).catch((error) => {
+            console.error("Failed to add unit to the database:", error);
+          });
+
+          setShowDialog(false); // Close the dialog
+          setUnitCode(""); // Reset unit code input
+          setSelectedPeriod(""); // Reset selected period
+        }
       } catch {
         setError("Failed to add the unit."); // Set error if fetch fails
       }
@@ -163,11 +206,11 @@ const Units: React.FC<UnitsProps> = ({
   };
 
   return (
-    <>
+    <div className="bg-white border border-blue-1400 w-full min-h-fit ml-2 mr-2 my-4 px-12 rounded-lg">
       {/* Units Tab Content */}
       <div className="mt-12 mb-4 w-full flex items-center relative">
         {/* Page Title */}
-        <h1 className="text-4xl absolute left-1/2 transform -translate-x-1/2">
+        <h1 className="text-4xl absolute left-1/2 transform -translate-x-1/2 text-blue-1300 font-semibold">
           Add your Units
         </h1>
         {/* Next Button to proceed to Preferences tab */}
@@ -191,42 +234,44 @@ const Units: React.FC<UnitsProps> = ({
       </div>
 
       {/* Search Feature */}
-      <div className="mt-10 mb-16 flex items-center justify-center space-x-4">
-        {/* Input field for unit code */}
-        <input
-          type="text"
-          className="w-48 px-6 py-2 rounded-lg bg-gray-1200"
-          placeholder="Enter unit code"
-          value={unitCode}
-          onChange={(e) => setUnitCode(e.target.value)}
-        />
-        {/* Search/Add Button */}
-        <button
-          onClick={handleSearch}
-          className="px-6 py-2 bg-blue-1000 text-white hover:bg-blue-1100 rounded-full"
-          disabled={loading}
-        >
-          {loading ? "Searching..." : "Add"}
-        </button>
+      <div className="mt-10 mb-16 flex items-center justify-center">
+        {loading ? (
+          // Show "Searching..." when loading
+          <p className="text-xl text-blue-1000 font-semibold">Searching...</p>
+        ) : (
+          // Show input form and search button when not loading
+          <div className="flex items-center justify-center space-x-4">
+            <input
+              type="text"
+              className="w-48 px-6 py-2 rounded-lg bg-blue-1500 border border-blue-1400 text-blue-1400"
+              placeholder="Enter unit code"
+              value={unitCode}
+              onChange={(e) => setUnitCode(e.target.value)}
+            />
+            <button
+              onClick={handleSearch}
+              className="px-6 py-2 bg-blue-1000 text-white hover:bg-blue-1100 rounded-full"
+              disabled={loading}
+            >
+              Add
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Display Error Message if any */}
       {error && <p className="text-red-500 mb-6">{error}</p>}
 
       {/* Display Added Units */}
-      <div className="flex space-x-4 mb-6 flex-wrap">
-        {/* Iterate over the courseList to display each unit */}
+      <div className="flex items-center justify-center space-x-4 mb-6 flex-wrap">
         {Object.keys(courseList)
           .sort((a, b) => a.localeCompare(b))
           .map((unit) => (
             <div key={unit} className="flex flex-col items-center group">
-              {/* Unit Badge with assigned color */}
               <div
-                className={`relative px-6 py-10 rounded-full flex items-center justify-center text-white ${unitColors[unit]}`}
+                className={`relative px-6 py-10 rounded-full flex items-center justify-center text-white bg-blue-1000`}
               >
                 <span className="text-lg">{unit.toUpperCase()}</span>
-
-                {/* 'X' Button to Remove Unit (visible on hover) */}
                 <span
                   className="absolute bottom-2 text-gray-300 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   onClick={(e) => {
@@ -245,39 +290,36 @@ const Units: React.FC<UnitsProps> = ({
       {showDialog && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-          onClick={() => setShowDialog(false)} // Close dialog when clicking outside
+          onClick={() => {
+            setShowDialog(false);
+            setLoading(false); // Reset loading when popup is closed
+          }}
         >
           <div
-            className="bg-gray-1100 p-6 rounded-lg relative"
+            className="bg-white border border-blue-1400 p-6 rounded-lg relative"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the dialog
           >
-            {/* Close Dialog Button */}
             <button
               onClick={() => setShowDialog(false)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
             >
               ✖
             </button>
-
-            {/* Dialog Title */}
-            <h2 className="text-xl mb-4">Select a Teaching Period</h2>
-
-            {/* Dropdown to Select Teaching Period */}
+            <h2 className="text-xl mb-4 font-semibold text-blue-1300">
+              Select a Teaching Period
+            </h2>
             <select
-              className="mb-4 px-6 py-2 rounded-lg bg-gray-1200 text-white"
+              className="mb-4 px-6 py-2 rounded-lg bg-blue-1500 text-black"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
             >
               <option value="">Select period</option>
-              {/* Populate dropdown with valid periods */}
               {validPeriods.map((period: any) => (
                 <option key={period.value} value={period.value}>
                   {period.text}
                 </option>
               ))}
             </select>
-
-            {/* Add Unit Button */}
             <div>
               <button
                 onClick={handleAddUnit}
@@ -289,7 +331,7 @@ const Units: React.FC<UnitsProps> = ({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

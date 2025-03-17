@@ -5,7 +5,7 @@ import ManageTabs from "./tabs/manageAllTabs";
 export default function Home() {
   return (
     // Main container div with styling classes
-    <div className="min-h-screen w-full items-center px-12 bg-gray-1000 text-white">
+    <div className="min-h-screen w-full items-center bg-blue-1500">
       {/* Render the main application component */}
       <ManageTabs />
     </div>

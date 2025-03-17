@@ -2,8 +2,6 @@
 
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import filterCourseList from "../algorithms/coreAlgorithm";
-import { Course, TimetableViewProps } from "../algorithms/interfaces";
 
 // TimetableView Component: Generates and displays the timetable based on courses and preferences
 const TimetableView: React.FC<TimetableViewProps> = ({
@@ -12,34 +10,10 @@ const TimetableView: React.FC<TimetableViewProps> = ({
   preferences,
   setTab,
 }) => {
-  // Filter the course list based on user preferences to generate a conflict-free timetable
-  const timetableData = filterCourseList(courseList, preferences.studyTimes);
 
   return (
     <>
-      {/* Header with Back button and title */}
-      <div className="flex items-center w-full mb-4">
-        <button
-          onClick={() => setTab("preferences")}
-          className="px-6 py-2 bg-blue-1000 text-white hover:bg-blue-1100 rounded-full"
-        >
-          Back
-        </button>
-        <h1 className="text-3xl font-semibold mx-auto text-blue-1000">
-          Your Timetable
-        </h1>
-      </div>
-
-      {/* Message if no timetable could be generated */}
-      {!timetableData && (
-        <div className="text-red-500 text-center mb-4">
-          Unable to create a conflict-free timetable with the selected
-          preferences.
-        </div>
-      )}
-
-      {/* Display the timetable (even if empty) */}
-      <Timetable courses={timetableData || {}} unitColors={unitColors} />
+        <Timetable courses={courseList} unitColors={unitColors} />
     </>
   );
 };
@@ -102,10 +76,9 @@ const groupClassesByDay = (courses: Course[]) => {
 
 const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
   const [hoveredCourse, setHoveredCourse] = useState<Course | null>(null);
-  const [tooltipStyle, setTooltipStyle] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
+  const [tooltipStyle, setTooltipStyle] = useState<
+    { top: number; left: number } | null
+  >(null);
 
   // Combine courses into one flat array and group them
   const allCourses = Object.values(courses).flatMap(
@@ -114,10 +87,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
   const timetable = groupClassesByDay(allCourses);
 
   // Time slots from 8 AM to 9 PM in half-hour increments (27 slots)
-  const timeSlots = Array.from(
-    { length: (21 - 8) * 2 + 1 },
-    (_, i) => 8 + i * 0.5
-  );
+  const timeSlots = Array.from({ length: (21 - 8) * 2 + 1 }, (_, i) => 8 + i * 0.5);
 
   return (
     <div className="w-full overflow-x-auto">
@@ -138,7 +108,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
           {timeSlots.map((time) => (
             <div
               key={time}
-              className="relative h-6 border-b border-blue-1400 bg-blue-1400"
+              className="relative h-6 border-b border-blue-1400 text-white bg-blue-1400"
             >
               {Number.isInteger(time) && (
                 <div className="absolute top-0 left-0 w-full text-center">
@@ -151,15 +121,9 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
 
         {/* Columns for each day */}
         {daysOfWeek.map((day) => (
-          <div
-            key={day}
-            className="relative border-l border-gray-300 overflow-visible"
-          >
+          <div key={day} className="relative border-l border-gray-300 overflow-visible">
             {timeSlots.map((time) => (
-              <div
-                key={time}
-                className="relative h-6 border-b border-blue-1400"
-              >
+              <div key={time} className="relative h-6 border-b border-blue-1400">
                 {timetable[day][time]?.map((course, index, arr) => {
                   const { start, end } = parseTime(course.time);
                   const duration = end - start; // Duration in hours
@@ -171,7 +135,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
                   return (
                     <div
                       key={course.id}
-                      className={`absolute text-xs p-1 rounded-md shadow-md cursor-pointer ${courseColor}`}
+                      className={`absolute text-xs p-1 text-white rounded-md shadow-md cursor-pointer ${courseColor}`}
                       style={{
                         top: 0,
                         left: `${leftPosition}%`,
@@ -221,8 +185,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
       </div>
 
       {/* Render the tooltip via a portal so it appears on top of everything else */}
-      {hoveredCourse &&
-        tooltipStyle &&
+      {hoveredCourse && tooltipStyle &&
         createPortal(
           <div
             style={{
@@ -235,8 +198,7 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
             className="bg-white text-black text-xs p-2 rounded-md border border-blue-1400 shadow-lg"
           >
             <div>
-              <strong>Unit:</strong>{" "}
-              {hoveredCourse.unitName || hoveredCourse.unitCode}
+              <strong>Unit:</strong> {hoveredCourse.unitName || hoveredCourse.unitCode}
             </div>
             <div>
               <strong>Class Type:</strong> {hoveredCourse.classType || "N/A"}

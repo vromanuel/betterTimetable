@@ -31,7 +31,7 @@ export default function Navbar({ user }) {
   };
 
   return (
-    <div className="navbar bg-gray-900 text-white">
+    <div className="navbar bg-blue-1200 text-white">
       <div className="navbar-start">
         <div className="dropdown">
           <div
@@ -51,48 +51,80 @@ export default function Navbar({ user }) {
               tabIndex={0}
               className="menu menu-sm dropdown-content rounded-box z-[1] mt-3 w-52 p-2 shadow bg-gray-1200"
             >
-              <li><a className="text-lg">Home</a></li>
-              <li><a className="text-lg">Generate</a></li>
-              <li><a className="text-lg">Plan</a></li>
-              <li><a className="text-lg">Saved</a></li>
+              <li><Link href="/generate" className="text-lg">Generate</Link></li>
+              <li><Link href="/plan" className="text-lg">Plan</Link></li>
+              <li><Link href="/saved" className="text-lg">Saved</Link></li>
+              <li><Link href="/course" className="text-lg">Study</Link></li>
+              <li><Link href="/explore" className="text-lg">Explore</Link></li>
             </ul>
           )}
         </div>
 
-        <Link href="/" className="btn btn-ghost rounded-full text-xl px-6">
+        <Link href="/" className="btn btn-ghost hover:bg-gray-700 rounded-full text-xl px-6 flex items-center space-x-4">
+          {/* Logo */}
+          <div className="qutLogo w-10 h-10"></div>
+          {/* Text */}
           <div className="inline">
-            <span className="text-white font-normal">Better</span><span className="text-blue-1000 font-normal inline">Timetable</span>
+            <span className="text-white font-normal">Better</span>
+            <span className="text-blue-1000 font-normal inline">Timetable</span>
           </div>
         </Link>
       </div>
 
       <div className="navbar-center hidden sm:flex">
         <ul className="menu menu-horizontal text-white">
-          {[
-            { name: "Home", href: "/" },
-            { name: "Generate", href: "/generate" },
-            { name: "Plan", href: "/plan" },
-            { name: "Saved", href: "/saved" },
-          ].map(({ name, href }) => (
-            <li key={href}>
+          <li>
+            <Link
+              href="/generate"
+              className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === "/generate" ? "active-link" : "hover:bg-gray-700"}`}
+            >
+              Generate
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/plan"
+              className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === "/plan" ? "active-link" : "hover:bg-gray-700"}`}
+            >
+              Plan
+            </Link>
+          </li>
+          {user && (
+            <li>
               <Link
-                href={href}
-                className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === href ? "active-link" : "hover:bg-gray-700"}`}
+                href="/saved"
+                className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === "/saved" ? "active-link" : "hover:bg-gray-700"}`}
               >
-                {name}
+                Saved
               </Link>
             </li>
-          ))}
+          )}
+          <li>
+            <Link
+              href="/course"
+              className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === "/course" ? "active-link" : "hover:bg-gray-700"}`}
+            >
+              Study
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/explore"
+              className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === "/explore" ? "active-link" : "hover:bg-gray-700"}`}
+            >
+              Explore
+            </Link>
+          </li>
         </ul>
       </div>
 
       <div className="navbar-end">
-        <ul className="menu menu-horizontal pl-1 pr-4">
+          <ul className="menu menu-horizontal pl-1 pr-4">
           {user ? (
             <li>
               <details>
                 <summary className="hover:bg-gray-700 rounded-full text-lg">{user.firstName} {user.lastName}</summary>
-                <ul className="p-2 text-lg">
+                <ul className="p-2 text-lg z-[1]">
                   <li><a>Account</a></li>
                   <li><a>Settings</a></li>
                   <li>
@@ -106,7 +138,7 @@ export default function Navbar({ user }) {
           ) : (
             <li key="/login">
               <Link
-                href="/login" 
+                href="/login"
                 className={`mx-2 px-5 py-2 rounded-full text-lg ${pathname === "/login" ? "active-link" : "hover:bg-gray-700"}`}
               >
                 Login
