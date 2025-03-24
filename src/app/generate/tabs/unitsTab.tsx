@@ -5,7 +5,7 @@ import { preconnect } from "react-dom";
 import checkUnit from "../download_data/checkUnits";
 import uploadUnit from "../download_data/uploadUnit";
 import downloadUnit from "../download_data/downloadUnits";
-import { courses } from "@/db/schema";
+import { timeslots } from "@/db/schema";
 
 // Define the structure for an individual course
 interface Course {
