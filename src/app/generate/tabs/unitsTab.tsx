@@ -208,6 +208,7 @@ const Units: React.FC<UnitsProps> = ({
   return (
     <div className="bg-white border border-blue-1400 w-full min-h-fit ml-2 mr-2 my-4 px-12 rounded-lg">
       {/* Units Tab Content */}
+
       <div className="mt-12 mb-4 w-full flex items-center relative">
         {/* Page Title */}
         <h1 className="text-4xl absolute left-1/2 transform -translate-x-1/2 text-blue-1300 font-semibold">

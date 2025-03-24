@@ -10,16 +10,16 @@ const TimetableView: React.FC<TimetableViewProps> = ({
   preferences,
   setTab,
 }) => {
-
   return (
     <>
-        <Timetable courses={courseList} unitColors={unitColors} />
+      <Timetable courses={courseList} unitColors={unitColors} />
     </>
   );
 };
 
 // Timetable Component: Renders the timetable grid with courses placed appropriately
 interface TimetableProps {
+  classes: string;
   courses: Record<string, { unitName: string; courses: Course[] }>;
   unitColors: { [unitCode: string]: string };
 }
@@ -74,11 +74,16 @@ const groupClassesByDay = (courses: Course[]) => {
   return timetable;
 };
 
-const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
+const Timetable: React.FC<TimetableProps> = ({
+  classes,
+  courses,
+  unitColors,
+}) => {
   const [hoveredCourse, setHoveredCourse] = useState<Course | null>(null);
-  const [tooltipStyle, setTooltipStyle] = useState<
-    { top: number; left: number } | null
-  >(null);
+  const [tooltipStyle, setTooltipStyle] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
 
   // Combine courses into one flat array and group them
   const allCourses = Object.values(courses).flatMap(
@@ -87,10 +92,16 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
   const timetable = groupClassesByDay(allCourses);
 
   // Time slots from 8 AM to 9 PM in half-hour increments (27 slots)
-  const timeSlots = Array.from({ length: (21 - 8) * 2 + 1 }, (_, i) => 8 + i * 0.5);
+  const timeSlots = Array.from(
+    { length: (21 - 8) * 2 + 1 },
+    (_, i) => 8 + i * 0.5
+  );
 
   return (
     <div className="w-full overflow-x-auto">
+      <div className="progress-bar">
+        <h1>hello</h1>
+      </div>
       {/* Header row with day names */}
       <div className="mt-6 grid grid-cols-[1fr_2fr_2fr_2fr_2fr_2fr] gap-2 text-white bg-blue-1400 p-4">
         <div></div>
@@ -121,9 +132,15 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
 
         {/* Columns for each day */}
         {daysOfWeek.map((day) => (
-          <div key={day} className="relative border-l border-gray-300 overflow-visible">
+          <div
+            key={day}
+            className="relative border-l border-gray-300 overflow-visible"
+          >
             {timeSlots.map((time) => (
-              <div key={time} className="relative h-6 border-b border-blue-1400">
+              <div
+                key={time}
+                className="relative h-6 border-b border-blue-1400"
+              >
                 {timetable[day][time]?.map((course, index, arr) => {
                   const { start, end } = parseTime(course.time);
                   const duration = end - start; // Duration in hours
@@ -185,7 +202,8 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
       </div>
 
       {/* Render the tooltip via a portal so it appears on top of everything else */}
-      {hoveredCourse && tooltipStyle &&
+      {hoveredCourse &&
+        tooltipStyle &&
         createPortal(
           <div
             style={{
@@ -198,7 +216,8 @@ const Timetable: React.FC<TimetableProps> = ({ courses, unitColors }) => {
             className="bg-white text-black text-xs p-2 rounded-md border border-blue-1400 shadow-lg"
           >
             <div>
-              <strong>Unit:</strong> {hoveredCourse.unitName || hoveredCourse.unitCode}
+              <strong>Unit:</strong>{" "}
+              {hoveredCourse.unitName || hoveredCourse.unitCode}
             </div>
             <div>
               <strong>Class Type:</strong> {hoveredCourse.classType || "N/A"}
